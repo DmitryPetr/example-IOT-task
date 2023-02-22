@@ -1,0 +1,21 @@
+stages:
+  - update-dev
+update:
+  stage: update-dev
+  only:
+    refs:
+      - dev
+  tags:
+    - dev_serv_62
+  before_script:
+    - sudo usermod -aG docker $USER
+    - git config --global --add safe.directory /Project/social-appointments-backend
+  script:
+    - cd /Project/social-appointments-backend
+    - git restore .
+    - git pull
+    - docker exec -d backend_62 npm install --legacy-peer-deps
+    - docker restart backend_62
+    - echo "обновлено `date -d" +3 hours" +"%d-%m-%Y %H:%M:%S"`, коммит $CI_COMMIT_SHA" > updatelog.txt
+  
+  when: manual
